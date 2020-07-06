@@ -17,7 +17,9 @@ function imageProcessor(filename) {
                 const monochromeWorker = new Worker(pathToMonochromeWorker, { workerData: { source: sourcePath, destination: monochromeDestination } });
                 resizeWorker.on("message", message => {
                     resizeWorkerFinished = true;
-                    resolve("resizeWorker finished processing");
+                    if (monochromeWorkerFinished) {
+                        resolve("resizeWorker finished processing");
+                    }                  
                 });
                 resizeWorker.on("error", error => {
                     reject(new Error(error.message));
@@ -30,7 +32,9 @@ function imageProcessor(filename) {
 
                 monochromeWorker.on("message", message => {
                     monochromeWorkerFinished = true;
-                    resolve("monochromeWorker finished processing");
+                    if (resizeWorkerFinished) {
+                        resolve("monochromeWorker finished processing");
+                    }              
                 });
                 monochromeWorker.on("error", error => {
                     reject(new Error(error.message));
